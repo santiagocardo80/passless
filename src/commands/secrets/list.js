@@ -3,17 +3,21 @@
 const { Command } = require('@oclif/command')
 const { CLIError } = require('@oclif/errors')
 const { cli } = require('cli-ux')
-const { userServices, secretServices } = require('@passless/services')
+const { secretServices } = require('@passless/services')
+const { AUTHENTICATED, isAuthenticated, authenticate } = require('@passless/auth')
 
 class SecretsListCommand extends Command {
   async run () {
     try {
       const { args } = this.parse(SecretsListCommand)
       const { username } = args
-      const password = await cli.prompt('Enter your password', { type: 'hide' })
 
-      const user = await userServices.authenticate(username, password)
-      if (!user) throw new CLIError('Invalid user or password')
+      let password = AUTHENTICATED
+      if (!await isAuthenticated(username)) {
+        password = await cli.prompt('Enter your password', { type: 'hide' })
+        const user = await authenticate(username, password)
+        if (!user) throw new CLIError('Invalid user or password')
+      }
 
       const secrets = await secretServices.listSecrets(username)
       cli.table(secrets.rows, {
@@ -30,6 +34,8 @@ class SecretsListCommand extends Command {
         throw new CLIError('Cannot list secrets')
       }
     }
+
+    this.exit(0)
   }
 }
 

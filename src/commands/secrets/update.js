@@ -3,20 +3,24 @@
 const { Command } = require('@oclif/command')
 const { CLIError } = require('@oclif/errors')
 const { cli } = require('cli-ux')
-const { userServices, secretServices } = require('@passless/services')
+const { secretServices } = require('@passless/services')
+const { AUTHENTICATED, isAuthenticated, authenticate } = require('@passless/auth')
 
 class SecretsUpdateCommand extends Command {
   async run () {
     try {
       const { args } = this.parse(SecretsUpdateCommand)
       const { username, name } = args
-      const password = await cli.prompt('Enter your password', { type: 'hide' })
 
-      const user = await userServices.authenticate(username, password)
-      if (!user) throw new CLIError('Invalid user or password')
+      let password = AUTHENTICATED
+      if (!await isAuthenticated(username)) {
+        password = await cli.prompt('Enter your password', { type: 'hide' })
+        const user = await authenticate(username, password)
+        if (!user) throw new CLIError('Invalid user or password')
+      }
 
       const value = await cli.prompt('Enter your new secret', { type: 'mask' })
-      await secretServices.updateSecret(user, password, name, value)
+      await secretServices.updateSecret(username, password, name, value)
       this.log(`secret ${name} updated`)
     } catch (err) {
       if (err instanceof CLIError) {
@@ -25,6 +29,8 @@ class SecretsUpdateCommand extends Command {
         throw new CLIError('Cannot update secret')
       }
     }
+
+    this.exit(0)
   }
 }
 

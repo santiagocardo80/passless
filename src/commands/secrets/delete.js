@@ -3,17 +3,21 @@
 const { Command } = require('@oclif/command')
 const { CLIError } = require('@oclif/errors')
 const { cli } = require('cli-ux')
-const { userServices, secretServices } = require('@passless/services')
+const { secretServices } = require('@passless/services')
+const { AUTHENTICATED, isAuthenticated, authenticate } = require('@passless/auth')
 
 class SecretsDeleteCommand extends Command {
   async run () {
     try {
       const { args } = this.parse(SecretsDeleteCommand)
       const { username, name } = args
-      const password = await cli.prompt('Enter your password', { type: 'hide' })
 
-      const user = await userServices.authenticate(username, password)
-      if (!user) throw new CLIError('Invalid user or password')
+      let password = AUTHENTICATED
+      if (!await isAuthenticated(username)) {
+        password = await cli.prompt('Enter your password', { type: 'hide' })
+        const user = await authenticate(username, password)
+        if (!user) throw new CLIError('Invalid user or password')
+      }
 
       await secretServices.deleteSecret(username, name)
       this.log(`secret ${name} deleted`)
@@ -24,6 +28,8 @@ class SecretsDeleteCommand extends Command {
         throw new CLIError('Cannot delete secret')
       }
     }
+
+    this.exit(0)
   }
 }
 

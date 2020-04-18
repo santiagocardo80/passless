@@ -1,19 +1,19 @@
 'use strict'
 
 const db = require('@passless/db')
-const {
-  generateKey,
-  encrypt,
-  decrypt
-} = require('@passless/crypto')
+const { encrypt, decrypt } = require('@passless/crypto')
+const { getSecretKey } = require('@passless/auth')
 
-async function createSecret (user, password, name, value) {
-  const secretKey = generateKey(password)
+async function createSecret (username, password, name, value) {
+  const user = await db.User.findOne({ where: { username } })
+  if (!user) throw new Error('User not found')
+
+  const secretKey = await getSecretKey(username, password)
   const randomKey = user.randomKey
   const encrypted = encrypt(value, secretKey, randomKey)
 
   return db.Secret.create({
-    username: user.username,
+    username,
     name,
     value: encrypted
   })
@@ -23,11 +23,14 @@ async function listSecrets (username) {
   return db.Secret.findAndCountAll({ where: { username } })
 }
 
-async function getSecret (user, password, name) {
+async function getSecret (username, password, name) {
+  const user = await db.User.findOne({ where: { username } })
+  if (!user) throw new Error('User not found')
+
   const secret = await db.Secret.findOne({ where: { name } })
   if (!secret) return null
 
-  const secretKey = generateKey(password)
+  const secretKey = await getSecretKey(username, password)
   const randomKey = user.randomKey
   const decrypted = decrypt(secret.value, secretKey, randomKey)
   secret.value = decrypted
@@ -35,8 +38,11 @@ async function getSecret (user, password, name) {
   return secret
 }
 
-async function updateSecret (user, password, name, value) {
-  const secretKey = generateKey(password)
+async function updateSecret (username, password, name, value) {
+  const user = await db.User.findOne({ where: { username } })
+  if (!user) throw new Error('User not found')
+
+  const secretKey = await getSecretKey(username, password)
   const randomKey = user.randomKey
   const encrypted = encrypt(value, secretKey, randomKey)
 

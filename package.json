@@ -8,13 +8,15 @@
   },
   "bugs": "https://github.com/santiagocardo80/passless/issues",
   "dependencies": {
-    "@passless/services": "file:packages/passless-services",
-    "@passless/crypto": "file:packages/passless-crypto",
-    "@passless/db": "file:packages/passless-db",
     "@oclif/command": "^1.5.19",
     "@oclif/config": "^1.15.1",
     "@oclif/plugin-help": "^2.2.3",
-    "cli-ux": "^5.4.5"
+    "@passless/auth": "file:packages/passless-auth",
+    "@passless/crypto": "file:packages/passless-crypto",
+    "@passless/db": "file:packages/passless-db",
+    "@passless/services": "file:packages/passless-services",
+    "cli-ux": "^5.4.5",
+    "clipboardy": "^2.3.0"
   },
   "devDependencies": {
     "@oclif/dev-cli": "^1.22.2",
