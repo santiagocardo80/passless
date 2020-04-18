@@ -1,0 +1,55 @@
+{
+  "name": "passless",
+  "description": "A secret manager for your CLI",
+  "version": "1.0.0",
+  "author": "Santiago Cardona @santiagocardo80",
+  "bin": {
+    "passless": "./bin/run"
+  },
+  "bugs": "https://github.com/santiagocardo80/passless/issues",
+  "dependencies": {
+    "@passless/services": "file:packages/passless-services",
+    "@passless/crypto": "file:packages/passless-crypto",
+    "@passless/db": "file:packages/passless-db",
+    "@oclif/command": "^1.5.19",
+    "@oclif/config": "^1.15.1",
+    "@oclif/plugin-help": "^2.2.3",
+    "cli-ux": "^5.4.5"
+  },
+  "devDependencies": {
+    "@oclif/dev-cli": "^1.22.2",
+    "globby": "^10.0.2",
+    "lerna": "^3.20.2",
+    "standard": "^14.3.3"
+  },
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "files": [
+    "/bin",
+    "/npm-shrinkwrap.json",
+    "/oclif.manifest.json",
+    "/src"
+  ],
+  "homepage": "https://github.com/santiagocardo80/passless",
+  "keywords": [
+    "oclif"
+  ],
+  "license": "MIT",
+  "main": "src/index.js",
+  "oclif": {
+    "commands": "./src/commands",
+    "bin": "passless",
+    "plugins": [
+      "@oclif/plugin-help"
+    ]
+  },
+  "repository": "santiagocardo80/passless",
+  "scripts": {
+    "lint": "standard --fix",
+    "postpack": "rm -f oclif.manifest.json",
+    "prepack": "oclif-dev manifest && oclif-dev readme",
+    "test": "echo NO TESTS",
+    "version": "oclif-dev readme && git add README.md"
+  }
+}
