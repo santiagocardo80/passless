@@ -5,7 +5,6 @@ const { CLIError } = require('@oclif/errors')
 const { cli } = require('cli-ux')
 const { Sequelize } = require('@passless/db')
 const { secretServices } = require('@passless/services')
-const { AUTHENTICATED, isAuthenticated, authenticate } = require('@passless/auth')
 
 class SecretsCreateCommand extends Command {
   async run () {
@@ -13,15 +12,10 @@ class SecretsCreateCommand extends Command {
       const { args } = this.parse(SecretsCreateCommand)
       const { username, name } = args
 
-      let password = AUTHENTICATED
-      if (!await isAuthenticated(username)) {
-        password = await cli.prompt('Enter your password', { type: 'hide' })
-        const user = await authenticate(username, password)
-        if (!user) throw new CLIError('Invalid user or password')
-      }
+      await this.config.runHook('authenticate', { username })
 
       const value = await cli.prompt('Enter your secret', { type: 'mask' })
-      const secret = await secretServices.createSecret(username, password, name, value)
+      const secret = await secretServices.createSecret(username, name, value)
 
       this.log(`secret: ${secret.name} created for user '${username}'`)
     } catch (err) {

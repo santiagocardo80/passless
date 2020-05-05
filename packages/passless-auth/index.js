@@ -3,18 +3,12 @@
 const { User, redisClient } = require('@passless/db')
 const { comparePassword, generateKey } = require('@passless/crypto')
 
-const AUTHENTICATED = Symbol('AUTHENTICATED')
-
 async function isAuthenticated (username) {
   return redisClient.get(username)
 }
 
 async function getSecretKey (username, password) {
-  if (password === AUTHENTICATED) {
-    return redisClient.get(username)
-  } else {
-    return generateKey(password)
-  }
+  return redisClient.get(username)
 }
 
 async function authenticate (username, password) {
@@ -30,7 +24,6 @@ async function authenticate (username, password) {
 }
 
 module.exports = {
-  AUTHENTICATED,
   isAuthenticated,
   getSecretKey,
   authenticate
