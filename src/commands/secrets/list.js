@@ -28,8 +28,6 @@ class SecretsListCommand extends Command {
         throw new CLIError('Cannot list secrets')
       }
     }
-
-    this.exit(0)
   }
 }
 

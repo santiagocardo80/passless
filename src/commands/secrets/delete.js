@@ -21,8 +21,6 @@ class SecretsDeleteCommand extends Command {
         throw new CLIError('Cannot delete secret')
       }
     }
-
-    this.exit(0)
   }
 }
 

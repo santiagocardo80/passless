@@ -23,8 +23,6 @@ class SecretsUpdateCommand extends Command {
         throw new CLIError('Cannot update secret')
       }
     }
-
-    this.exit(0)
   }
 }
 
